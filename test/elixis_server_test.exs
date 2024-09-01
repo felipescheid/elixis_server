@@ -1,5 +1,5 @@
 defmodule ElixisServerTest do
-  use ExUnit.case()
+  use ExUnit.Case
 
   setup do
     Application.stop(:elixis)
@@ -7,11 +7,12 @@ defmodule ElixisServerTest do
   end
 
   setup do
-    opts = [:binary, packet, :line, active: false]
+    opts = [:binary, packet: :line, active: false]
     {:ok, socket} = :gen_tcp.connect("localhost", 4040, opts)
     %{socket: socket}
   end
 
+  @tag :distributed
   test "server interaction", %{socket: socket} do
     assert send_and_recv(socket, "UNKNOWN shopping \r\n") == "UNKOWN COMMAND\r\n"
 

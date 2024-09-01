@@ -28,7 +28,7 @@ defmodule ElixisServer.Command do
 
     iex> ElixisServer.Command.parse "GET shopping\r\n"
     {:error, :unknown_command}
-  
+
 
   """
   def parse(line) do
@@ -47,8 +47,10 @@ defmodule ElixisServer.Command do
   def run(command)
 
   def run({:create, bucket}) do
-    Elixis.Registry.create(Elixis.Registry, bucket)
-    {:ok, "OK\r\n"} 
+    case Elixis.Router.route(bucket, Elixis.Registry, :create, [Elixis.Registry, bucket]) do
+      pid when is_pid(pid) -> {:ok, "OK\r\n"}
+      _ -> {:error, "FAILED TO CREATE BUCKET"}
+    end
   end
 
   def run({:get, bucket, key}) do
@@ -64,7 +66,7 @@ defmodule ElixisServer.Command do
       {:ok, "OK\r\n"}
     end)
   end
-  
+
   def run({:delete, bucket, key}) do
     lookup(bucket, fn pid ->
       Elixis.Bucket.delete(pid, key)
@@ -73,10 +75,9 @@ defmodule ElixisServer.Command do
   end
 
   defp lookup(bucket, callback) do
-    case Elixis.Registry.lookup(Elixis.Registry, bucket) do
+    case Elixis.Router.route(bucket, Elixis.Registry, :lookup, [Elixis.Registry, bucket]) do
       {:ok, pid} -> callback.(pid)
       :error -> {:error, :not_found}
     end
   end
-
 end
