@@ -31,8 +31,7 @@ defmodule ElixisServer do
   end
 
   defp read_line(socket) do
-    {:ok, data} = :gen_tcp.recv(socket, 0)
-    data
+    :gen_tcp.recv(socket, 0)
   end
 
   defp write_line(socket, {:ok, text}) do

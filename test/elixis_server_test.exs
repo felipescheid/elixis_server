@@ -8,13 +8,12 @@ defmodule ElixisServerTest do
 
   setup do
     opts = [:binary, packet: :line, active: false]
-    {:ok, socket} = :gen_tcp.connect("localhost", 4040, opts)
+    {:ok, socket} = :gen_tcp.connect(~c"localhost", 4040, opts)
     %{socket: socket}
   end
 
-  @tag :distributed
   test "server interaction", %{socket: socket} do
-    assert send_and_recv(socket, "UNKNOWN shopping \r\n") == "UNKOWN COMMAND\r\n"
+    assert send_and_recv(socket, "UNKNOWN shopping\r\n") == "UNKOWN COMMAND\r\n"
 
     assert send_and_recv(socket, "GET shopping eggs\r\n") == "NOT FOUND\r\n"
 
